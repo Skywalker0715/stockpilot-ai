@@ -1,0 +1,76 @@
+LLM + Google Maps Backend (Technical Test)
+Overview
+
+This project is a backend service built with FastAPI that integrates an LLM (Large Language Model) with a Google Maps search feature.
+It was prepared as part of the technical test for HeyPico.ai.
+
+The service provides endpoints to:
+
+Query Google Maps Places API (or a simulated fallback if no API key is available).
+
+Generate responses from the LLM and integrate them with search results.
+
+Important Note on Google Maps API Key
+
+Google Maps API requires a billing-enabled account in order to issue a valid API key.
+Since I currently do not have the ability to enable billing, the project does not use a real Google Maps API key.
+
+What I did instead:
+
+Implemented a fallback mechanism that simulates Google Maps responses.
+
+If no API key is provided, the service returns a result with:
+
+A placeholder name (e.g., "Search result for: <query>").
+
+A default Google Maps search link (https://www.google.com/maps/search/?q=\
+<query>).
+
+This ensures the backend logic works end-to-end without requiring billing.
+The fallback keeps the system functional while demonstrating the integration design.
+
+Project Structure
+llm-gmaps-backend/
+│── app/
+│   ├── routes/        # API routes
+│   ├── services/      # Business logic (LLM + Maps)
+│   ├── main.py        # FastAPI entrypoint
+│   ├── config.py      # Configuration & API key (optional)
+│   └── models.py      # Data models
+│
+│── tests/             # Unit tests
+│── venv/              # Python virtual environment
+│── requirements.txt   # Dependencies
+
+
+Setup Instructions
+
+1. Clone repository & install dependencies:
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+
+
+2. Run the backend:
+uvicorn app.main:app --reload --port 8000
+
+
+3. Test API in VS Code (REST Client) or Postman:
+GET http://127.0.0.1:8000/search?query=coffee%20shop
+
+
+Clarification for HeyPico.ai Reviewers
+- LLM Integration: The backend successfully integrates an LLM API endpoint (/generate).
+- Maps Integration: Since a real Google Maps API key requires billing, I used a mock/fallback response.
+- Goal: The implementation demonstrates the design, integration logic, and automation workflow that would work identically with a real API key.
+If a real Google Maps API Key is provided, the service will call the actual Places API without code changes.
+
+Next Steps (With a Valid API Key)
+To enable full functionality:
+1. Create a Google Cloud Project.
+2. Enable the Places API.
+3. Add your API key to config.py: GOOGLE_API_KEY = "your_api_key_here"
+4. Restart the server → real Google Maps data will be returned.
+
+Thank you for reviewing this submission.
+The project is designed with flexibility so it can run both in mock mode (no billing required) and real API mode (with a valid key).
