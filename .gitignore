@@ -1,0 +1,36 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Packaging / build artifacts
+*.egg-info/
+build/
+dist/
+
+# Local databases (StockPilot, future)
+*.db
+*.sqlite3
+
+# Frontend tooling (future)
+node_modules/
+frontend/dist/
+
+# Editors and OS files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
