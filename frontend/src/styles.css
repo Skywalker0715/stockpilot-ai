@@ -1,0 +1,202 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 3rem;
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #8884;
+  margin-bottom: 1rem;
+}
+
+.app-header h1 {
+  font-size: 1.4rem;
+  margin: 0.5rem 0;
+}
+
+nav {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tab {
+  border: 1px solid #8886;
+  background: transparent;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.tab.active {
+  font-weight: 600;
+  border-bottom-width: 2px;
+}
+
+.notice {
+  background: #8882;
+  border: 1px solid #8886;
+  border-radius: 6px;
+  padding: 0.5rem 0.9rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.toolbar form {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+}
+
+label {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #8888;
+  border-radius: 5px;
+  background: transparent;
+}
+
+button {
+  font: inherit;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid #8888;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
+button.primary {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.card {
+  border: 1px solid #8886;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  margin-top: 0.25rem;
+}
+
+.form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+dl {
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.15rem 0;
+}
+
+.row dt {
+  margin: 0;
+}
+
+.row dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid #8884;
+  vertical-align: top;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.error {
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  padding: 0.5rem 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.error p {
+  margin: 0 0 0.5rem;
+}
+
+.empty {
+  color: #777;
+  font-style: italic;
+}
+
+.disclaimer,
+.hint {
+  font-size: 0.9rem;
+  color: #777;
+}
