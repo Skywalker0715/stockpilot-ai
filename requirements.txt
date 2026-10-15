@@ -3,7 +3,4 @@ uvicorn[standard]
 httpx
 python-dotenv
 pydantic
-slowapi
-itsdangerous
 pytest
-pytest-asyncio

@@ -1,12 +1,21 @@
-# load .env, konfigurasi global
+# Runtime configuration loaded from environment variables.
 
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-LLM_API_URL = os.getenv("LLM_API_URL")
-LLM_API_KEY = os.getenv("LLM_API_KEY")
-ALLOWED_API_KEYS = [k.strip() for k in (os.getenv("ALLOWED_API_KEYS") or "").split(",") if k.strip()]
-RATE_LIMIT = os.getenv("RATE_LIMIT", "10/minute")
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# SQLite database file. Overridable for tests and portable installs.
+DB_PATH = Path(os.getenv("STOCKPILOT_DB_PATH", str(BASE_DIR / "stockpilot.db")))
+
+# The MVP is single-user and local: only the frontend dev server may call the API.
+CORS_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+    if origin.strip()
+]
+
