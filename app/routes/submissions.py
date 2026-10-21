@@ -68,3 +68,14 @@ def update_submission(
     if submission is None:
         raise HTTPException(status_code=404, detail="Submission not found")
     return submission
+
+
+@router.delete("/{submission_id}", response_model=SubmissionOut)
+def delete_submission(submission_id: int, conn: DbDep) -> SubmissionOut:
+    """Delete a single submission record: 200 with the deleted record,
+    404 when it does not exist. Only this row is removed — the asset, its
+    image/metadata, and other submissions are not affected."""
+    submission = submission_service.delete_submission(conn, submission_id)
+    if submission is None:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    return submission

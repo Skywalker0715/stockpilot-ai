@@ -14,7 +14,12 @@ MIGRATIONS_DIR = Path(__file__).resolve().parent / "migrations"
 def connect(db_path: Path | None = None) -> sqlite3.Connection:
     """Open a SQLite connection with sane defaults for this app."""
     path = Path(db_path) if db_path is not None else config.DB_PATH
-    conn = sqlite3.connect(str(path))
+    # check_same_thread=False: FastAPI runs sync dependencies, endpoint
+    # bodies, and dependency teardown on anyio worker threads, which are
+    # not guaranteed to be the same thread. Connections here are
+    # request-scoped (see get_connection), so a connection is never used
+    # by two threads at the same time; disabling the check is safe.
+    conn = sqlite3.connect(str(path), check_same_thread=False)
     conn.row_factory = sqlite3.Row
     # Enforce foreign keys on every connection (SQLite default is off).
     conn.execute("PRAGMA foreign_keys = ON")

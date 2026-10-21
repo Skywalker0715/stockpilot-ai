@@ -64,8 +64,11 @@ class AssetUpdate(BaseModel):
     keywords: list[str] | None = Field(None, max_length=50)
     category: str | None = Field(None, max_length=100)
     archived: bool | None = None
+    # Origin of the metadata being saved (e.g. 'ai_suggested' after an AI
+    # draft is explicitly saved). Omit to keep the current value.
+    metadata_origin: MetadataOrigin | None = None
 
-    @field_validator("display_name", "archived")
+    @field_validator("display_name", "archived", "metadata_origin")
     @classmethod
     def display_name_not_null(cls, value: object) -> object:
         if value is None:
@@ -97,6 +100,14 @@ class AssetOut(BaseModel):
     archived: bool
     created_at: str
     updated_at: str
+    # Image-upload fields (002 migration). image_url is populated by the
+    # service layer when a stored image exists; null for record-only assets.
+    stored_path: str | None = None
+    original_filename: str | None = None
+    width: int | None = None
+    height: int | None = None
+    file_size: int | None = None
+    image_url: str | None = None
 
 
 class AssetListOut(BaseModel):
@@ -104,6 +115,27 @@ class AssetListOut(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class ImageUploadOut(BaseModel):
+    """Response for POST /api/v1/uploads: the created asset plus its image URL."""
+
+    asset: AssetOut
+    image_url: str
+
+
+class AssetDeleteOut(BaseModel):
+    """Response for DELETE /api/v1/assets/{id}.
+
+    image_removed is null when the asset had no stored image; false means the
+    database deletion succeeded but the app-managed file could not be removed
+    (the failure is logged server-side and does not roll back the deletion).
+    """
+
+    id: int
+    display_name: str
+    deleted_submissions: int
+    image_removed: bool | None
 
 
 class SubmissionCreate(BaseModel):
@@ -168,8 +200,155 @@ class InsightsSummaryOut(BaseModel):
 
 
 class AiStatusOut(BaseModel):
-    # Honest indicator required by the approved scope (Q6):
-    # the MVP has no AI provider; manual entry always works.
+    # Honest indicator (approved scope Q6): reports whether a Cohere key is
+    # actually configured; manual entry always works either way.
     ai_configured: bool
     message: str
+    # Active vision model (informational; config.STOCKPILOT_AI_MODEL).
+    model: str | None = None
+
+
+class AiAnalyzeRequest(BaseModel):
+    """Analyze an uploaded image. The result is a DRAFT only: nothing is
+    persisted until the user explicitly saves via PATCH /assets/{id}."""
+
+    asset_id: int = Field(..., gt=0)
+    # Explicit consent: the frontend shows a consent notice before sending
+    # image data to the AI provider; the API refuses to call Cohere without it.
+    consent: bool = False
+
+    @field_validator("consent")
+    @classmethod
+    def consent_required(cls, value: bool) -> bool:
+        if not value:
+            raise ValueError(
+                "consent is required: confirm that the image may be sent "
+                "to Cohere for AI analysis"
+            )
+        return value
+
+
+class AiDraftOut(BaseModel):
+    """Unsaved AI metadata draft for one asset."""
+
+    asset_id: int
+    title: str
+    description: str | None
+    category: str | None
+    keywords: list[str] = Field(..., max_length=50)
+    # Model that actually produced this draft (honesty: never guess).
+    model: str
+
+
+
+# ---------------------------------------------------------------------------
+# Vision Insights models (image analysis beyond Generate's metadata draft)
+# ---------------------------------------------------------------------------
+
+class VisualAttributesOut(BaseModel):
+    """Observable visual attributes of an image.
+
+    Described as observations of image content, not as measured market
+    performance, search volume, or sales data.
+    """
+
+    objects: list[str] = Field(default_factory=list, max_length=20)
+    scene: list[str] = Field(default_factory=list, max_length=10)
+    dominant_colors: list[str] = Field(default_factory=list, max_length=8)
+    lighting: str | None = None
+    mood: str | None = None
+    composition: str | None = None
+    orientation: str | None = None
+    copy_space: str | None = None
+
+
+class CommercialUseIdeaOut(BaseModel):
+    """A plausible commercial use case for the image.
+
+    Labeled as an AI suggestion: never presented as guaranteed demand or a
+    sales forecast.
+    """
+
+    use_case: str = Field(..., max_length=120)
+    fit: str | None = Field(None, max_length=200)
+
+
+class KeywordGapAnalysisOut(BaseModel):
+    """Comparison of existing metadata keywords against visual attributes.
+
+    Suggests missing relevant keywords without duplicates and without
+    unsupported claims.
+    """
+
+    existing_keywords: list[str] = Field(default_factory=list, max_length=50)
+    suggested_missing: list[str] = Field(default_factory=list, max_length=30)
+    reasoning: str | None = Field(None, max_length=1000)
+
+
+class MetadataQualityReviewOut(BaseModel):
+    """Honest review of existing metadata quality.
+
+    Flags vague titles, repetitive keywords, unsupported terms, and
+    descriptions that may not accurately represent the image.
+    """
+
+    title_assessment: str | None = Field(None, max_length=500)
+    keyword_issues: list[str] = Field(default_factory=list, max_length=20)
+    description_assessment: str | None = Field(None, max_length=1000)
+    unsupported_terms: list[str] = Field(default_factory=list, max_length=20)
+
+
+class VisionInsightsOut(BaseModel):
+    """Complete vision-insights analysis for one asset.
+
+    All fields are AI-generated inferences/observations and are labeled as
+    such in the UI.
+    """
+
+    asset_id: int
+    visual_attributes: VisualAttributesOut
+    commercial_use_ideas: list[CommercialUseIdeaOut] = Field(
+        default_factory=list, max_length=10
+    )
+    keyword_gap_analysis: KeywordGapAnalysisOut
+    metadata_quality_review: MetadataQualityReviewOut
+    actionable_recommendations: list[str] = Field(
+        default_factory=list, max_length=15
+    )
+    model: str
+
+
+class VisionInsightsRequest(BaseModel):
+    """Analyze an uploaded image for vision insights.
+
+    The result is AI-generated and is NOT persisted to the asset's editable
+    metadata until the user explicitly applies keyword suggestions.
+    """
+
+    asset_id: int = Field(..., gt=0)
+    consent: bool = False
+
+    @field_validator("consent")
+    @classmethod
+    def consent_required(cls, value: bool) -> bool:
+        if not value:
+            raise ValueError(
+                "consent is required: confirm that the image may be sent "
+                "to Cohere for AI vision analysis"
+            )
+        return value
+
+
+class VisionInsightsRecordOut(BaseModel):
+    """A persisted vision-insights record, served to the UI."""
+
+    id: int
+    asset_id: int
+    visual_attributes: dict
+    commercial_use_ideas: list
+    keyword_gap_analysis: dict
+    metadata_quality_review: dict
+    actionable_recommendations: list[str]
+    model: str
+    created_at: str
 

@@ -1,6 +1,12 @@
 fastapi
 uvicorn[standard]
+# Cohere REST calls (sync client inside request handlers) and test transports.
 httpx
 python-dotenv
 pydantic
 pytest
+# Required by FastAPI for multipart image upload endpoints.
+python-multipart
+# Image decoding/validation of uploads (magic bytes are checked separately;
+# Pillow proves the file is a real decodable image and reads dimensions).
+Pillow

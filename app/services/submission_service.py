@@ -116,3 +116,20 @@ def update_submission(
     row = cur.fetchone()
     conn.commit()
     return _row_to_submission(row) if row else None
+
+
+def delete_submission(
+    conn: sqlite3.Connection, submission_id: int
+) -> SubmissionOut | None:
+    """Permanently delete one submission record.
+
+    Only this row is removed: the referenced asset, its image and metadata,
+    and sibling submissions are untouched (submissions have no child rows).
+    Returns None when the record does not exist.
+    """
+    submission = get_submission(conn, submission_id)
+    if submission is None:
+        return None
+    conn.execute("DELETE FROM submissions WHERE id = ?", (submission_id,))
+    conn.commit()
+    return submission

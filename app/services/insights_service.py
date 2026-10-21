@@ -35,13 +35,18 @@ def summary(conn: sqlite3.Connection) -> InsightsSummaryOut:
         FROM submissions WHERE status = 'rejected' GROUP BY rejection_category
         """,
     )
-    period = conn.execute(
-        "SELECT MIN(created_at) AS start, MAX(created_at) AS end FROM submissions"
-    ).fetchone()
-
-    # Sample size = submissions with an explicit submitted date (PRD: show sample size).
-    sample = conn.execute(
-        "SELECT COUNT(*) AS n FROM submissions WHERE submitted_at IS NOT NULL"
+    # Date range and sample size describe the SAME set: only submissions
+    # with an explicit submitted_at (NULL submitted_at rows are excluded
+    # from both). No recorded dates -> count 0 and NULL bounds, reported
+    # honestly rather than falling back to record-creation timestamps.
+    dated = conn.execute(
+        """
+        SELECT COUNT(*) AS n,
+               MIN(submitted_at) AS start,
+               MAX(submitted_at) AS end
+        FROM submissions
+        WHERE submitted_at IS NOT NULL
+        """
     ).fetchone()
 
     return InsightsSummaryOut(
@@ -51,7 +56,7 @@ def summary(conn: sqlite3.Connection) -> InsightsSummaryOut:
         submissions_by_status=by_status,
         submissions_by_platform=by_platform,
         rejections_by_category=rejections_by_category,
-        sample_size=sample["n"],
-        period_start=period["start"],
-        period_end=period["end"],
+        sample_size=dated["n"],
+        period_start=dated["start"],
+        period_end=dated["end"],
     )

@@ -25,6 +25,10 @@ dist/
 *.db
 *.sqlite3
 
+# Application-managed image uploads and local DB backups (never commit)
+uploads/
+backups/
+
 # Frontend tooling (future)
 node_modules/
 frontend/dist/

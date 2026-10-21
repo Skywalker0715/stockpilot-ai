@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "../api";
 import {
   SUBMISSION_STATUSES,
@@ -7,6 +7,15 @@ import {
   type SubmissionList,
   type SubmissionStatus,
 } from "../types";
+import {
+  ConfirmDialog,
+  EmptyState,
+  ErrorPanel,
+  LoadingBlock,
+  PageHeader,
+  Pagination,
+  StatusBadge,
+} from "../ui";
 
 interface FormState {
   id: number | null; // null = creating
@@ -38,14 +47,41 @@ export function SubmissionsView() {
   const [saving, setSaving] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // Delete flow for a single submission record (confirmation dialog).
+  const [deleteTarget, setDeleteTarget] = useState<Submission | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  // Asset dropdown loading (errors surfaced with a retry).
+  const [assetsError, setAssetsError] = useState<string | null>(null);
+  const assetsLoadingRef = useRef(false);
 
-  // The create form needs the asset list for its dropdown.
-  useEffect(() => {
-    api
-      .listAssets({ page_size: 200 })
-      .then((l) => setAssets(l.items))
-      .catch(() => setAssets([]));
+  // The create form needs the asset list for its dropdown. Re-runs on demand
+  // (form open) so assets created/archived in another view are picked up; the
+  // ref guard prevents duplicate concurrent requests. Archived assets are
+  // included so existing submissions still resolve a proper asset name.
+  const loadAssets = useCallback(async () => {
+    if (assetsLoadingRef.current) return;
+    assetsLoadingRef.current = true;
+    try {
+      const [active, archived] = await Promise.all([
+        api.listAssets({ archived: false, page_size: 100 }),
+        api.listAssets({ archived: true, page_size: 100 }),
+      ]);
+      setAssets([...active.items, ...archived.items]);
+      setAssetsError(null);
+    } catch (e: unknown) {
+      setAssetsError(
+        e instanceof ApiError ? e.message : "Failed to load assets",
+      );
+    } finally {
+      assetsLoadingRef.current = false;
+    }
   }, []);
+
+  useEffect(() => {
+    void loadAssets();
+  }, [loadAssets]);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -70,6 +106,9 @@ export function SubmissionsView() {
   const startCreate = () => {
     setForm({ ...EMPTY_FORM });
     setFormError(null);
+    setNotice(null);
+    // Refresh assets: another view/tab may have added or archived some.
+    void loadAssets();
   };
 
   const startEdit = (s: Submission) => {
@@ -120,6 +159,39 @@ export function SubmissionsView() {
     }
   };
 
+  const closeDelete = () => {
+    if (!deleting) setDeleteTarget(null);
+  };
+
+  const confirmDelete = async () => {
+    // Guard against repeated submissions while a delete is in flight.
+    if (!deleteTarget || deleting) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const result = await api.deleteSubmission(deleteTarget.id);
+      setDeleteTarget(null);
+      setNotice(
+        `Submission #${result.id} (${result.platform}, ${result.status}) deleted. The asset, its image and metadata, and other submissions are unchanged.`,
+      );
+      load();
+    } catch (e: unknown) {
+      if (e instanceof ApiError && e.status === 404) {
+        setDeleteTarget(null);
+        setNotice(
+          "That submission no longer exists; the list has been refreshed.",
+        );
+        load();
+      } else {
+        setDeleteError(
+          e instanceof ApiError ? e.message : "Failed to delete submission",
+        );
+      }
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const pageSize = list?.page_size ?? 20;
   const totalPages = list ? Math.max(1, Math.ceil(list.total / pageSize)) : 1;
 
@@ -130,203 +202,298 @@ export function SubmissionsView() {
 
   return (
     <div>
+      <PageHeader
+        title="Submissions"
+        subtitle="Track where each asset has been submitted and how it was received."
+        actions={
+          <button type="button" className="btn btn-primary" onClick={startCreate}>
+            Record submission
+          </button>
+        }
+      />
+
       <div className="toolbar">
-        <label htmlFor="status-filter">Status</label>
-        <select
-          id="status-filter"
-          value={statusFilter}
-          onChange={(e) => {
-            setPage(1);
-            setStatusFilter(e.target.value as SubmissionStatus | "");
-          }}
-        >
-          <option value="">All</option>
-          {SUBMISSION_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <button type="button" className="primary" onClick={startCreate}>
-          Record submission
-        </button>
+        <div className="toolbar__field">
+          <label htmlFor="status-filter">Status</label>
+          <select
+            id="status-filter"
+            value={statusFilter}
+            onChange={(e) => {
+              setPage(1);
+              setStatusFilter(e.target.value as SubmissionStatus | "");
+            }}
+          >
+            <option value="">All</option>
+            {SUBMISSION_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {form && (
-        <form className="card form" onSubmit={submitForm}>
-          <h3>{form.id === null ? "Record submission" : `Edit submission #${form.id}`}</h3>
-          {formError && (
-            <p className="error" role="alert">
-              {formError}
-            </p>
-          )}
-          <div className="field">
-            <label htmlFor="s-asset">Asset</label>
-            <select
-              id="s-asset"
-              required
-              disabled={form.id !== null}
-              value={form.asset_id}
-              onChange={(e) => setForm({ ...form, asset_id: e.target.value })}
-            >
-              <option value="">Choose an asset…</option>
-              {assets.map((a) => (
-                <option key={a.id} value={a.id}>
-                  #{a.id} {a.display_name}
-                </option>
-              ))}
-            </select>
-            {assets.length === 0 && (
-              <p className="hint">No assets available. Create an asset first.</p>
-            )}
-          </div>
-          <div className="field">
-            <label htmlFor="s-platform">
-              Platform <span aria-hidden="true">*</span>
-            </label>
-            <input
-              id="s-platform"
-              required
-              maxLength={100}
-              value={form.platform}
-              onChange={(e) => setForm({ ...form, platform: e.target.value })}
-              placeholder="Adobe Stock"
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="s-status">Status</label>
-            <select
-              id="s-status"
-              value={form.status}
-              onChange={(e) =>
-                setForm({ ...form, status: e.target.value as SubmissionStatus })
-              }
-            >
-              {SUBMISSION_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="s-submitted-at">Submitted date</label>
-            <input
-              id="s-submitted-at"
-              type="date"
-              value={form.submitted_at}
-              onChange={(e) => setForm({ ...form, submitted_at: e.target.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="s-rejection-category">Rejection category</label>
-            <input
-              id="s-rejection-category"
-              maxLength={100}
-              value={form.rejection_category}
-              onChange={(e) =>
-                setForm({ ...form, rejection_category: e.target.value })
-              }
-              placeholder="duplicate, quality, technical…"
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="s-rejection-note">Rejection note</label>
-            <textarea
-              id="s-rejection-note"
-              maxLength={4000}
-              rows={3}
-              value={form.rejection_note}
-              onChange={(e) => setForm({ ...form, rejection_note: e.target.value })}
-            />
-          </div>
-          <div className="actions">
-            <button type="submit" className="primary" disabled={saving}>
-              {saving ? "Saving…" : "Save"}
-            </button>
-            <button type="button" onClick={() => setForm(null)} disabled={saving}>
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
-
-      {listError && (
-        <div className="error" role="alert">
-          <p>{listError}</p>
-          <button type="button" onClick={load}>
-            Retry
+      {notice && (
+        <div className="success-panel" role="status">
+          <p>{notice}</p>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => setNotice(null)}
+            aria-label="Dismiss success message"
+          >
+            Dismiss
           </button>
         </div>
       )}
 
-      {loading && !list && <p role="status">Loading submissions…</p>}
+      {deleteTarget && (
+        <ConfirmDialog
+          title="Delete submission record?"
+          destructive
+          busy={deleting}
+          confirmLabel="Delete submission"
+          onConfirm={() => void confirmDelete()}
+          onCancel={closeDelete}
+        >
+          <p>
+            Submission <strong>#{deleteTarget.id}</strong> —{" "}
+            <strong>{assetLabel(deleteTarget.asset_id)}</strong>,{" "}
+            {deleteTarget.platform} ({deleteTarget.status}).
+          </p>
+          <p>
+            Only this submission record is deleted. The asset, its image and
+            metadata, and any other submissions are not affected.
+          </p>
+          <p className="hint">This cannot be undone.</p>
+          {deleteError && <ErrorPanel message={deleteError} />}
+        </ConfirmDialog>
+      )}
+
+      {form && (
+        <form className="panel form-panel" onSubmit={submitForm}>
+          <div className="panel__header">
+            <h3 className="panel__title">
+              {form.id === null ? "Record submission" : `Edit submission #${form.id}`}
+            </h3>
+          </div>
+          <div className="panel__body">
+            {formError && <ErrorPanel message={formError} />}
+            <div className="form-grid">
+              <div className="field">
+                <label htmlFor="s-asset">Asset</label>
+                <select
+                  id="s-asset"
+                  required
+                  disabled={form.id !== null}
+                  value={form.asset_id}
+                  onChange={(e) => setForm({ ...form, asset_id: e.target.value })}
+                >
+                  <option value="">Choose an asset…</option>
+                  {assets.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      #{a.id} {a.display_name}
+                      {a.archived ? " (archived)" : ""}
+                    </option>
+                  ))}
+                </select>
+                {assetsError ? (
+                  <p className="hint" role="alert">
+                    {assetsError}{" "}
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => void loadAssets()}
+                    >
+                      Retry
+                    </button>
+                  </p>
+                ) : assets.length === 0 ? (
+                  <p className="hint">No assets available. Create an asset first.</p>
+                ) : null}
+              </div>
+              <div className="field">
+                <label htmlFor="s-platform">
+                  Platform <span aria-hidden="true">*</span>
+                </label>
+                <input
+                  id="s-platform"
+                  required
+                  maxLength={100}
+                  value={form.platform}
+                  onChange={(e) => setForm({ ...form, platform: e.target.value })}
+                  placeholder="Adobe Stock"
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="s-status">Status</label>
+                <select
+                  id="s-status"
+                  value={form.status}
+                  onChange={(e) =>
+                    setForm({ ...form, status: e.target.value as SubmissionStatus })
+                  }
+                >
+                  {SUBMISSION_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="s-submitted-at">Submitted date</label>
+                <input
+                  id="s-submitted-at"
+                  type="date"
+                  value={form.submitted_at}
+                  onChange={(e) => setForm({ ...form, submitted_at: e.target.value })}
+                />
+              </div>
+              <div className="field field--full">
+                <label htmlFor="s-rejection-category">Rejection category</label>
+                <input
+                  id="s-rejection-category"
+                  maxLength={100}
+                  value={form.rejection_category}
+                  onChange={(e) =>
+                    setForm({ ...form, rejection_category: e.target.value })
+                  }
+                  placeholder="duplicate, quality, technical…"
+                />
+              </div>
+              <div className="field field--full">
+                <label htmlFor="s-rejection-note">Rejection note</label>
+                <textarea
+                  id="s-rejection-note"
+                  maxLength={4000}
+                  rows={3}
+                  value={form.rejection_note}
+                  onChange={(e) => setForm({ ...form, rejection_note: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="btn btn-primary" disabled={saving}>
+                {saving ? "Saving…" : "Save"}
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setForm(null)}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </form>
+      )}
+
+      {listError && <ErrorPanel message={listError} onRetry={load} />}
+
+      {loading && !list && <LoadingBlock label="Loading submissions…" />}
 
       {list && list.items.length === 0 && !listError && (
-        <p className="empty">
-          {statusFilter
-            ? `No submissions with status “${statusFilter}”.`
-            : "No submissions recorded yet. Use “Record submission” to add one."}
-        </p>
+        <div className="panel">
+          <div className="panel__body">
+            <EmptyState
+              message={
+                statusFilter
+                  ? `No submissions with status “${statusFilter}”.`
+                  : "No submissions recorded yet"
+              }
+              hint={
+                statusFilter
+                  ? "Choose a different status in the filter above."
+                  : "Use “Record submission” to add one."
+              }
+            />
+          </div>
+        </div>
       )}
 
       {list && list.items.length > 0 && (
-        <>
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Asset</th>
-                <th scope="col">Platform</th>
-                <th scope="col">Status</th>
-                <th scope="col">Submitted</th>
-                <th scope="col">Reviewed</th>
-                <th scope="col">Rejection category</th>
-                <th scope="col">Rejection note</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {list.items.map((s) => (
-                <tr key={s.id}>
-                  <td>{s.id}</td>
-                  <td>{assetLabel(s.asset_id)}</td>
-                  <td>{s.platform}</td>
-                  <td>{s.status}</td>
-                  <td>{s.submitted_at ?? "—"}</td>
-                  <td>{s.reviewed_at ?? "—"}</td>
-                  <td>{s.rejection_category ?? "—"}</td>
-                  <td>{s.rejection_note ?? "—"}</td>
-                  <td>
-                    <button type="button" onClick={() => startEdit(s)}>
-                      Edit
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div className="pagination">
-            <button
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage(page - 1)}
-            >
-              Previous
-            </button>
-            <span>
-              Page {list.page} of {totalPages} ({list.total} total)
-            </span>
-            <button
-              type="button"
-              disabled={page >= totalPages}
-              onClick={() => setPage(page + 1)}
-            >
-              Next
-            </button>
+        <div className="panel">
+          <div className="panel__header">
+            <h3 className="panel__title">Submissions</h3>
+            <span className="panel__meta">{list.total} total</span>
           </div>
-        </>
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Asset</th>
+                  <th scope="col">Platform</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Submitted</th>
+                  <th scope="col">Reviewed</th>
+                  <th scope="col">Rejection category</th>
+                  <th scope="col">Rejection note</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {list.items.map((s) => (
+                  <tr key={s.id}>
+                    <td className="cell-id">{s.id}</td>
+                    <td className="cell-truncate" title={assetLabel(s.asset_id)}>
+                      {assetLabel(s.asset_id)}
+                    </td>
+                    <td>{s.platform}</td>
+                    <td>
+                      <StatusBadge status={s.status} />
+                    </td>
+                    <td className="cell-num">
+                      {s.submitted_at ?? <span className="muted">—</span>}
+                    </td>
+                    <td className="cell-num">
+                      {s.reviewed_at ?? <span className="muted">—</span>}
+                    </td>
+                    <td>
+                      {s.rejection_category ?? <span className="muted">—</span>}
+                    </td>
+                    <td
+                      className="cell-truncate"
+                      title={s.rejection_note ?? undefined}
+                    >
+                      {s.rejection_note ?? <span className="muted">—</span>}
+                    </td>
+                    <td className="cell-actions">
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => startEdit(s)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={() => {
+                          setDeleteTarget(s);
+                          setDeleteError(null);
+                          setNotice(null);
+                        }}
+                        disabled={deleting}
+                        aria-label={`Delete submission ${s.id} for ${s.platform}`}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination
+            page={list.page}
+            total={list.total}
+            totalPages={totalPages}
+            onPage={setPage}
+          />
+        </div>
       )}
     </div>
   );
