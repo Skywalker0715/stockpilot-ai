@@ -75,6 +75,7 @@ export function VisionInsightsView({
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [insights, setInsights] = useState<VisionInsightsRecord | null>(null);
   const [insightsError, setInsightsError] = useState<string | null>(null);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [applying, setApplying] = useState(false);
   const [applyError, setApplyError] = useState<string | null>(null);
@@ -139,6 +140,7 @@ export function VisionInsightsView({
   const runAnalysis = async () => {
     if (!selectedAsset) return;
     setAnalyzing(true);
+    setAnalysisError(null);
     setInsightsError(null);
     setApplyError(null);
     setNotice(null);
@@ -146,7 +148,7 @@ export function VisionInsightsView({
       setInsights(await api.visionAnalyze(selectedAsset.id, consentGiven));
       setNotice("Vision analysis complete. Review the suggestions below.");
     } catch (error: unknown) {
-      setInsightsError(error instanceof ApiError ? error.message : "Vision analysis failed");
+      setAnalysisError(error instanceof ApiError ? error.message : "Vision analysis failed");
     } finally {
       setAnalyzing(false);
     }
@@ -204,28 +206,29 @@ export function VisionInsightsView({
         Select an existing image. It is sent to Cohere only after you confirm consent.
         Analysis is saved separately; metadata changes only when you apply selected keywords.
       </p>
-      {notice && <div className="success-panel"><p>{notice}</p></div>}
+      {notice && <div className="success-panel" role="status"><p>{notice}</p></div>}
 
       <section className="panel">
         <div className="panel__header"><h3 className="panel__title">Choose an image</h3></div>
         <div className="panel__body">
-          <label className="field-label" htmlFor="vision-image-search">Search images</label>
-          <input
-            id="vision-image-search"
-            className="input"
-            type="search"
-            value={search}
-            onChange={(event) => { setPage(1); setSearch(event.target.value); }}
-            placeholder="Search your library"
-          />
+          <div className="vision-search">
+            <label htmlFor="vision-image-search">Search images</label>
+            <input
+              id="vision-image-search"
+              type="search"
+              value={search}
+              onChange={(event) => { setPage(1); setSearch(event.target.value); }}
+              placeholder="Search your library"
+            />
+          </div>
           {assetsLoading && <LoadingBlock label="Loading images…" />}
-          {assetsError && <ErrorPanel message={assetsError} />}
+          {assetsError && <ErrorPanel message={assetsError} onRetry={() => void loadAssets()} />}
           {assets && assets.items.length === 0 && !assetsLoading && (
             <EmptyState message="No images available" hint="Add an image from Generate or Library first." />
           )}
           {assets && assets.items.length > 0 && (
             <>
-              <ul className="library-grid">
+              <ul className="library-grid vision-assets-grid">
                 {assets.items.map((asset) => (
                   <AssetCard
                     key={asset.id}
@@ -233,6 +236,8 @@ export function VisionInsightsView({
                     selected={selectedAsset?.id === asset.id}
                     onSelect={(next) => {
                       setSelectedAsset(next);
+                      setInsightsError(null);
+                      setAnalysisError(null);
                       setKeywordsToApply(new Set());
                       setNotice(null);
                       void loadInsights(next.id);
@@ -252,26 +257,33 @@ export function VisionInsightsView({
             <h3 className="panel__title">Analyze: {selectedAsset.title || selectedAsset.display_name}</h3>
           </div>
           <div className="panel__body">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={consentGiven}
-                onChange={(event) => setConsentGiven(event.target.checked)}
-              />
-              I agree to send this image to Cohere for AI analysis.
-            </label>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => void runAnalysis()}
-              disabled={!consentGiven || analyzing}
-              style={{ marginTop: "0.75rem" }}
-            >
-              {analyzing ? "Analyzing…" : insights ? "Run analysis again" : "Analyze image"}
-            </button>
+            <div className="vision-analysis-actions">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={consentGiven}
+                  onChange={(event) => setConsentGiven(event.target.checked)}
+                />
+                I agree to send this image to Cohere for AI analysis.
+              </label>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => void runAnalysis()}
+                disabled={!consentGiven || analyzing}
+              >
+                {analyzing ? "Analyzing…" : insights ? "Run analysis again" : "Analyze image"}
+              </button>
+            </div>
             {analyzing && <LoadingBlock label="Analyzing image…" />}
-            {insightsError && <ErrorPanel message={insightsError} />}
-            {!insights && !insightsError && !analyzing && (
+            {insightsError && <ErrorPanel message={insightsError} onRetry={() => void loadInsights(selectedAsset.id)} />}
+            {analysisError && (
+              <ErrorPanel
+                message={analysisError}
+                onRetry={consentGiven ? () => void runAnalysis() : undefined}
+              />
+            )}
+            {!insights && !insightsError && !analysisError && !analyzing && (
               <p className="hint">No saved analysis for this image yet. Confirm consent to start.</p>
             )}
           </div>

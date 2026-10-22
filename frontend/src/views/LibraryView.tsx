@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, ApiError } from "../api";
 import type { Asset, AssetList } from "../types";
-import { AssetsView } from "./AssetsView";
+import { LibraryManagementView } from "./LibraryManagementView";
 import {
   ConfirmDialog,
   EmptyState,
@@ -58,7 +58,7 @@ export function LibraryView({
         <button type="button" className="btn btn-ghost btn-sm" onClick={() => setManageAssets(false)}>
           Back to Library
         </button>
-        <AssetsView />
+        <LibraryManagementView />
       </div>
     );
   }
@@ -72,8 +72,8 @@ export function LibraryView({
 
   // Archive = PATCH archived=true on the existing endpoint. The item leaves
   // the Library (the default list hides archived rows) but its metadata,
-  // uploaded file, and submission history are untouched, and the Assets page
-  // can restore it via "Show archived" -> "Unarchive".
+  // uploaded file, and submission history are untouched; the manager can
+  // restore archived records.
   const confirmArchive = async () => {
     if (!archiveTarget || archiving) return; // no repeated submissions
     setArchiving(true);
@@ -83,7 +83,7 @@ export function LibraryView({
       await api.updateAsset(archiveTarget.id, { archived: true });
       setArchiveTarget(null);
       setNotice(
-        `“${name}” was archived and removed from the Library. Nothing was deleted — restore it any time from the Assets page (“Show archived” → “Unarchive”).`,
+        `“${name}” was archived and removed from the Library. Nothing was deleted — restore it from all library records.`,
       );
       load();
     } catch (e: unknown) {
@@ -107,13 +107,13 @@ export function LibraryView({
       />
 
       <button type="button" className="btn btn-ghost btn-sm" onClick={() => setManageAssets(true)}>
-        Manage assets, archives, and deletions
+        Manage all library records
       </button>
 
       <p className="note">
         Archiving removes an image from the Library but keeps everything:
         metadata, the uploaded file, and submission history. Restore any item
-        from the Assets page (“Show archived” → “Unarchive”).
+        from all library records by filtering to archived items.
       </p>
 
       {notice && (
@@ -236,8 +236,7 @@ export function LibraryView({
             history are kept.
           </p>
           <p className="hint">
-            Restore it any time from the Assets page: enable “Show archived”,
-            then choose “Unarchive”.
+            Restore it any time from all library records by filtering to archived items.
           </p>
           {archiveError && <ErrorPanel message={archiveError} />}
         </ConfirmDialog>

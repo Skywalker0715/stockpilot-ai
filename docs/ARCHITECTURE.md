@@ -33,7 +33,7 @@ re-introduced by accident.
 ## 3. Runtime layout
 ```
 frontend/            React + Vite SPA (dev server on :5173)
-  src/views/         Generate, Library, VisionInsights, Assets, Submissions, Dashboard
+  src/views/         Generate, Library, LibraryManagement, VisionInsights, Dashboard
   src/api.ts         typed fetch wrapper for /api/v1
 app/
   main.py            FastAPI app, CORS, lifespan runs migrations
@@ -62,7 +62,8 @@ The API is mounted at `/api/v1/...`. CORS allows only the configured origins
 - **Metadata Service** — validation and normalization of title, description,
   keywords, and category on write.
 - **Submission Tracker** (`routes/submissions.py`) — platform, status, dates,
-  rejection notes.
+  rejection notes. The API and stored history remain supported; the current
+  frontend has no standalone submission management screen.
 - **Insights Service** (`routes/insights.py`, `services/insights_service.py`)
   — deterministic aggregation of the user's own records. No model involved.
 - **Cohere Service** (`services/cohere_service.py`) — the single provider

@@ -218,7 +218,7 @@ def test_library_archive_and_restore_flow(client, upload_dir):
     assert stored.exists()
     assert client.get(f"/api/v1/images/{asset_id}").status_code == 200
 
-    # Restore through the Assets page flow: "Show archived" -> Unarchive.
+    # Restore through the Library record manager's archived filter.
     archived_list = client.get(
         "/api/v1/assets", params={"archived": True}
     ).json()

@@ -38,7 +38,7 @@ function toForm(asset: Asset): FormState {
   };
 }
 
-export function AssetsView() {
+export function LibraryManagementView() {
   const [list, setList] = useState<AssetList | null>(null);
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
@@ -194,8 +194,8 @@ export function AssetsView() {
   return (
     <div>
       <PageHeader
-        title="Assets"
-        subtitle="Manage the creative assets in your library and their metadata."
+        title="All library records"
+        subtitle="Search and manage image records, including archived items."
         actions={
           <button type="button" className="btn btn-primary" onClick={startCreate}>
             Add asset

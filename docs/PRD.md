@@ -37,9 +37,12 @@ Deliver a usable local-first workspace for one creator to organize stock assets,
 - The app states clearly that observations are model output, not verified facts.
 
 ### Submission and review history
-- I can record a submission date, platform, status, and rejection note.
-- I can categorize a rejection manually and correct the category later.
-- The dashboard summarizes only data actually entered or imported by the user.
+- Submission and review records remain supported by the versioned API and
+  stored data model; the current frontend has no standalone submissions screen.
+- Records include platform, status, dates, rejection note, and optional
+  user-selected rejection category; the API allows correcting the category.
+- Dashboard summaries include only submission data already recorded by the
+  user or another supported API client.
 
 ### Personal insights
 - I can view counts and trends derived from my recorded history.

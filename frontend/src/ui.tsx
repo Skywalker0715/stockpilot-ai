@@ -2,7 +2,6 @@
 // Only real repeated patterns live here (per docs/CODING_STANDARDS.md).
 
 import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode } from "react";
-import { SUBMISSION_STATUSES, type SubmissionStatus } from "./types";
 
 export function PageHeader({
   title,
@@ -22,16 +21,6 @@ export function PageHeader({
       {actions && <div className="page-actions">{actions}</div>}
     </header>
   );
-}
-
-export function isSubmissionStatus(key: string): key is SubmissionStatus {
-  return (SUBMISSION_STATUSES as string[]).includes(key);
-}
-
-// Status is always rendered as text inside the badge; the color is
-// reinforcement only (never color alone).
-export function StatusBadge({ status }: { status: SubmissionStatus }) {
-  return <span className={`badge badge-${status}`}>{status}</span>;
 }
 
 export function EmptyState({ message, hint }: { message: string; hint?: string }) {

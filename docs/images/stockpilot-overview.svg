@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="690" viewBox="0 0 1200 690" role="img" aria-labelledby="title desc">
+  <title id="title">StockPilot AI application and technology overview</title>
+  <desc id="desc">An illustration of the StockPilot workspace and its React, TypeScript, Vite, FastAPI, SQLite, and optional Cohere architecture.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4f7fc"/><stop offset="1" stop-color="#e9effa"/></linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#244eb0"/><stop offset="1" stop-color="#5181e6"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1b2a45" flood-opacity=".10"/></filter>
+    <style>
+      text{font-family:Inter,'Segoe UI',Arial,sans-serif;fill:#1c2533}.muted{fill:#718096}.tiny{font-size:11px}.small{font-size:13px}.label{font-size:12px;font-weight:700;letter-spacing:1.2px}.title{font-size:30px;font-weight:750;letter-spacing:-.5px}.cardtitle{font-size:15px;font-weight:700}
+    </style>
+  </defs>
+  <rect width="1200" height="690" rx="26" fill="url(#bg)"/>
+  <circle cx="1110" cy="80" r="100" fill="#dce7fb" opacity=".55"/>
+  <circle cx="70" cy="635" r="130" fill="#dce7fb" opacity=".4"/>
+  <text x="58" y="57" class="label" fill="#2e5fd0">STOCKPILOT AI · LOCAL-FIRST WORKSPACE</text>
+  <text x="58" y="99" class="title">From image library to creator workflow</text>
+  <text x="58" y="126" class="small muted">Organize assets, review metadata, and keep analysis connected to your own records.</text>
+  <g filter="url(#shadow)">
+    <rect x="48" y="157" width="592" height="395" rx="18" fill="#fff"/>
+    <path d="M66 157h139v395H66a18 18 0 0 1-18-18V175a18 18 0 0 1 18-18Z" fill="#131c2b"/>
+    <circle cx="82" cy="182" r="11" fill="#2e5fd0"/><path d="m77 183 4-6 5 6-5 5z" fill="#fff"/>
+    <text x="101" y="186" font-size="14" font-weight="700" fill="#fff">StockPilot <tspan fill="#7fa1f2">AI</tspan></text>
+    <rect x="64" y="213" width="108" height="34" rx="8" fill="#26364f"/>
+    <path d="M78 230h13m-6-6v12" stroke="#a9c0fa" stroke-width="1.8" stroke-linecap="round"/><text x="101" y="234" class="small" fill="#fff">Generate</text>
+    <text x="78" y="275" class="small" fill="#c3cddb">▧　Library</text>
+    <text x="70" y="318" class="tiny" font-weight="700" letter-spacing="1" fill="#8d99ab">MORE</text>
+    <text x="78" y="346" class="small" fill="#c3cddb">▦　Dashboard</text>
+    <text x="78" y="378" class="small" fill="#c3cddb">◉　Vision Insights</text>
+    <rect x="220" y="179" width="390" height="45" rx="10" fill="#fff"/>
+    <text x="240" y="202" class="cardtitle">Dashboard</text>
+    <text x="240" y="216" class="tiny muted">A quick view of your StockPilot workspace</text>
+    <rect x="220" y="238" width="120" height="97" rx="11" fill="#f7f9fc" stroke="#e4e8ef"/>
+    <rect x="350" y="238" width="120" height="97" rx="11" fill="#f7f9fc" stroke="#e4e8ef"/>
+    <rect x="480" y="238" width="130" height="97" rx="11" fill="#f7f9fc" stroke="#e4e8ef"/>
+    <text x="234" y="260" class="tiny muted">ACTIVE RECORDS</text><text x="234" y="297" font-size="28" font-weight="700" fill="#2e5fd0">—</text><text x="234" y="318" class="tiny muted">In your library</text>
+    <text x="364" y="260" class="tiny muted">UPLOADED IMAGES</text><text x="364" y="297" font-size="28" font-weight="700" fill="#1c7c4d">—</text><text x="364" y="318" class="tiny muted">Stored locally</text>
+    <text x="494" y="260" class="tiny muted">ARCHIVED</text><text x="494" y="297" font-size="28" font-weight="700" fill="#96650a">—</text><text x="494" y="318" class="tiny muted">Restorable records</text>
+    <rect x="220" y="350" width="390" height="177" rx="12" fill="#fff" stroke="#e4e8ef"/>
+    <text x="240" y="377" class="cardtitle">Your asset workflow</text><text x="240" y="398" class="tiny muted">Records and counts come from your saved data</text>
+    <rect x="240" y="417" width="105" height="75" rx="8" fill="#eaf0fc"/><rect x="250" y="427" width="85" height="55" rx="5" fill="#b9cdf5"/>
+    <circle cx="274" cy="448" r="12" fill="#6f95e6"/><path d="M251 477l23-20 18 15 15-11 28 21h-84z" fill="#3d69c8" opacity=".8"/>
+    <text x="358" y="438" class="small" font-weight="700">Keep the creator in control</text><text x="358" y="459" class="tiny muted">AI output stays a suggestion until reviewed.</text>
+    <rect x="358" y="474" width="118" height="24" rx="12" fill="#e7f4ec"/><circle cx="371" cy="486" r="4" fill="#1c7c4d"/><text x="382" y="490" class="tiny" fill="#1c7c4d">Local data first</text>
+  </g>
+  <path d="M656 345h34" stroke="#8da6d9" stroke-width="3" stroke-linecap="round"/><path d="m684 337 9 8-9 8" fill="none" stroke="#8da6d9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="657" y="326" class="tiny muted">API requests</text>
+  <g filter="url(#shadow)">
+    <rect x="705" y="157" width="445" height="395" rx="18" fill="#fff"/>
+    <text x="733" y="193" class="label" fill="#718096">APPLICATION STACK</text>
+    <rect x="733" y="211" width="389" height="75" rx="12" fill="#eff5ff" stroke="#dce7fb"/>
+    <rect x="749" y="228" width="42" height="42" rx="10" fill="#61dafb"/><path d="M770 235c-12 0-19 4-19 7s7 7 19 7 19-4 19-7-7-7-19-7Zm0 0c-6 10-8 18-5 20s10-3 16-13 8-18 5-20-10 3-16 13Z" fill="none" stroke="#17324d" stroke-width="1.5"/><circle cx="770" cy="249" r="2.5" fill="#17324d"/>
+    <text x="808" y="239" class="cardtitle">Frontend</text><text x="808" y="261" class="small muted">React 18 · TypeScript · Vite</text><text x="1093" y="253" class="tiny" text-anchor="end" fill="#2e5fd0">UI</text>
+    <path d="M927 287v20" stroke="#a9bce2" stroke-width="2"/><path d="m922 302 5 7 5-7" fill="none" stroke="#a9bce2" stroke-width="2"/>
+    <rect x="733" y="311" width="389" height="75" rx="12" fill="#eef8f3" stroke="#d5ecdf"/>
+    <rect x="749" y="328" width="42" height="42" rx="10" fill="#159b83"/><path d="M760 339h20v4h-20zm0 8h20v4h-20zm0 8h13v4h-13z" fill="#fff"/>
+    <text x="808" y="339" class="cardtitle">Backend API</text><text x="808" y="361" class="small muted">Python · FastAPI · versioned REST</text><text x="1093" y="353" class="tiny" text-anchor="end" fill="#159b83">API</text>
+    <path d="M927 387v20" stroke="#a9bce2" stroke-width="2"/><path d="m922 402 5 7 5-7" fill="none" stroke="#a9bce2" stroke-width="2"/>
+    <rect x="733" y="411" width="389" height="75" rx="12" fill="#fff8e9" stroke="#f2e6c6"/>
+    <rect x="749" y="428" width="42" height="42" rx="10" fill="#f0c94e"/><ellipse cx="770" cy="440" rx="12" ry="5" fill="#fff7d6" stroke="#765d13" stroke-width="1.5"/><path d="M758 440v17c0 3 5 5 12 5s12-2 12-5v-17m-24 8c0 3 5 5 12 5s12-2 12-5" fill="none" stroke="#765d13" stroke-width="1.5"/>
+    <text x="808" y="439" class="cardtitle">Local database</text><text x="808" y="461" class="small muted">SQLite file · SQL migrations</text><text x="1093" y="453" class="tiny" text-anchor="end" fill="#96650a">DATA</text>
+    <rect x="733" y="502" width="389" height="31" rx="9" fill="#f4efff"/><circle cx="753" cy="517" r="7" fill="#7654c8"/><path d="M750 517h6m-3-3v6" stroke="#fff" stroke-width="1.2"/><text x="768" y="521" class="small" font-weight="650">Optional AI: Cohere Vision · explicit consent required</text>
+  </g>
+  <text x="58" y="600" class="label" fill="#718096">DATA &amp; FILES</text>
+  <rect x="58" y="616" width="278" height="43" rx="10" fill="#fff" stroke="#dce3ee"/><path d="M76 630h18l5 5v14H76z" fill="#eaf0fc" stroke="#2e5fd0" stroke-width="1.5"/><text x="110" y="634" class="small" font-weight="700">stockpilot.db</text><text x="110" y="650" class="tiny muted">Assets, metadata, review history</text>
+  <rect x="350" y="616" width="278" height="43" rx="10" fill="#fff" stroke="#dce3ee"/><path d="M368 630h18l5 5v14h-23z" fill="#e7f4ec" stroke="#1c7c4d" stroke-width="1.5"/><text x="402" y="634" class="small" font-weight="700">uploads/</text><text x="402" y="650" class="tiny muted">App-managed image files</text>
+  <text x="1145" y="641" text-anchor="end" class="tiny muted">Illustrative overview · values omitted</text>
+</svg>

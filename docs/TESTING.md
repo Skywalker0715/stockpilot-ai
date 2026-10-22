@@ -61,9 +61,23 @@ so repeated runs leave no residue.
   `stockpilot.db` or `uploads/`.
 
 ## Current status
-- Offline suite: `python -m pytest tests/` — 92 passed.
-- Live smoke test: 20 checks passed against a running server.
-- Frontend: `npm run build` (strict TypeScript + production build) passes.
+- Offline suite: `python -m pytest tests/ -q` — 92 passed on October 22,
+  2026.
+- Live smoke test: 20 checks were recorded in the prior validation; it was not
+  run as part of this cleanup.
+- Frontend: `npm.cmd run build` (strict TypeScript + production build) passes
+  on October 22, 2026. (`npm.cmd` avoids the local PowerShell script policy.)
+
+## Retired UI test audit
+
+All test modules, fixtures, and helpers were reviewed against current routes
+and workflows. No backend tests were obsolete: asset CRUD, uploads, AI,
+Vision Insights, database migrations, submission API behavior, Dashboard
+aggregates, and security controls remain supported. In particular,
+`tests/test_submissions.py` and submission cascade/summary assertions remain
+because the API, data model, and Dashboard still use that history. No tests,
+fixtures, mocks, or helper functions were removed. The unreferenced frontend
+`SubmissionsView` was removed; there is no frontend test runner configured.
 
 ## Known gaps
 - The frontend has **no test runner**, so the consent gate on the Generate

@@ -8,11 +8,8 @@ import type {
   AssetInput,
   AssetList,
   ImageUploadResult,
-  InsightsSummary,
-  Submission,
-  SubmissionInput,
-  SubmissionList,
-  SubmissionStatus,
+  AssetSummary,
+  SubmissionCount,
   VisionInsightsRecord,
 } from "./types";
 
@@ -69,7 +66,7 @@ async function parseOrThrow<T>(response: Response): Promise<T> {
 
 export const api = {
   aiStatus: () => request<AiStatus>("/api/v1/ai/status"),
-  insights: () => request<InsightsSummary>("/api/v1/insights/summary"),
+  insights: () => request<AssetSummary>("/api/v1/insights/summary"),
 
   // Upload an image file (multipart). Server validates content and stores it
   // in the app-managed uploads directory.
@@ -133,20 +130,12 @@ export const api = {
   visionInsights: (assetId: number) =>
     request<VisionInsightsRecord>(`/api/v1/vision/insights/${assetId}`),
 
-  listSubmissions: (params: { asset_id?: number; status?: SubmissionStatus; page?: number; page_size?: number }) => {
+  listSubmissions: (params: { asset_id?: number; page?: number; page_size?: number }) => {
     const search = new URLSearchParams();
     if (params.asset_id) search.set("asset_id", String(params.asset_id));
-    if (params.status) search.set("status", params.status);
     if (params.page) search.set("page", String(params.page));
     if (params.page_size) search.set("page_size", String(params.page_size));
     const qs = search.toString();
-    return request<SubmissionList>(`/api/v1/submissions${qs ? `?${qs}` : ""}`);
+    return request<SubmissionCount>(`/api/v1/submissions${qs ? `?${qs}` : ""}`);
   },
-  createSubmission: (input: SubmissionInput) =>
-    request<Submission>("/api/v1/submissions", { method: "POST", body: JSON.stringify(input) }),
-  updateSubmission: (id: number, input: Partial<SubmissionInput>) =>
-    request<Submission>(`/api/v1/submissions/${id}`, { method: "PATCH", body: JSON.stringify(input) }),
-  // Deletes ONLY this submission record; the asset and its data are kept.
-  deleteSubmission: (id: number) =>
-    request<Submission>(`/api/v1/submissions/${id}`, { method: "DELETE" }),
 };

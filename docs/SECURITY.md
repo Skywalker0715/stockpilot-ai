@@ -1,7 +1,36 @@
-# Security and Privacy Baseline
+# Security Policy
 
-This document states the baseline and how the current build meets it. Items
-marked **Gap** are not yet implemented.
+StockPilot AI is an unauthenticated, single-user application intended to run
+on one machine. The current MVP is the only supported version; no release or
+branch support schedule is published.
+
+## Security at a glance
+
+This illustration summarizes implemented controls and deployment limits. It
+is an orientation aid, not a security certification; the detailed policy and
+known gaps below remain authoritative.
+
+![StockPilot AI security controls and current boundaries](images/security-overview.svg)
+
+## Reporting a vulnerability
+
+Do not publish API keys, credentials, personal data, exploit instructions, or
+other sensitive details in a public issue. No private security contact is
+configured in this repository. If the repository host offers private
+vulnerability reporting, use that channel; otherwise contact the maintainer
+privately through a channel already known to you. Do not post sensitive
+details publicly when no private route is available.
+
+Include the affected component or version, a concise impact description,
+reproduction steps that avoid real user data, and any relevant logs with
+secrets removed. The maintainer should acknowledge receipt and communicate
+whether the issue is reproducible and what remediation is planned. No response
+or fix timeline is guaranteed.
+
+## Current controls
+
+The controls below are implemented in the current code and are not a security
+certification or guarantee:
 
 ## Data minimization
 - Store only data needed for the creator's workflow.
@@ -101,7 +130,7 @@ marked **Gap** are not yet implemented.
 - Errors do not expose secrets or stack traces.
 - Backup/restore process verified.
 
-## Open gaps
+## Known gaps and deployment limits
 These are known and **not** yet closed. Do not describe them as mitigated.
 
 - **No authentication.** The app is unauthenticated and must stay bound to
@@ -115,3 +144,9 @@ These are known and **not** yet closed. Do not describe them as mitigated.
 - **Provider error detail is limited by the upstream provider.** When Cohere
   returns an unexpected failure, the exact cause stays provider-side; the app
   reports a generic message rather than leaking raw upstream payloads.
+
+Keep the backend bound to localhost. Do not expose it to a network or use it
+for multiple users until authentication, authorization, and rate limiting have
+been designed and reviewed. Keep dependencies updated and review changes for
+security impact before deployment. There is no automated dependency scanning
+or formal release security process configured at present.
