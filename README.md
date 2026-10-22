@@ -13,7 +13,7 @@ StockPilot keeps an image library and its editable metadata in a local SQLite da
 - **Library:** upload images; create, search, edit, archive, restore, and delete asset records; manage metadata and keywords.
 - **Metadata suggestions:** optional Cohere vision output is a draft. It is not saved until reviewed and explicitly applied.
 - **Vision Insights:** analyze an uploaded image for visual attributes, possible use cases, keyword gaps, metadata quality, and recommendations. Results are stored separately from asset metadata.
-- **Review data:** the backend retains submission and rejection history endpoints and summarizes recorded data on the Dashboard. There is no standalone submission screen in the current UI.
+- **Review data:** the backend retains submission and rejection history endpoints plus an API summary. There is no standalone submission screen in the current UI.
 - **Dashboard:** deterministic counts and date ranges from locally recorded data; no predictions about acceptance or sales.
 - **Privacy controls:** both AI workflows require per-image consent before sending an image to Cohere.
 
@@ -80,7 +80,7 @@ erDiagram
   }
 ```
 
-One asset can have multiple submission records and multiple Vision Insights analyses. Deleting an asset cascades to those related records. Uploaded image files themselves are stored separately in `uploads/`; the database row keeps the managed filename. Back up **both** `stockpilot.db` and `uploads/` to preserve the full library. The ER diagram shows the principal application tables; `schema_migrations` is internal migration bookkeeping.
+One asset can have multiple submission records and multiple Vision Insights analyses. The submissions table is still used by the API, the linked-record count in the asset deletion flow, and the insights summary endpoint; it has no dedicated management screen in the current UI. Deleting an asset cascades to both related tables. Uploaded image files themselves are stored separately in `uploads/`; the database row keeps the managed filename. Back up **both** `stockpilot.db` and `uploads/` to preserve the full library. The ER diagram shows the principal application tables; `schema_migrations` is internal migration bookkeeping.
 
 ## Requirements
 
