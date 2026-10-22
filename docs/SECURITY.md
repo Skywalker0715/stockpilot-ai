@@ -10,7 +10,7 @@ This illustration summarizes implemented controls and deployment limits. It
 is an orientation aid, not a security certification; the detailed policy and
 known gaps below remain authoritative.
 
-![StockPilot AI security controls and current boundaries](images/security-overview.svg)
+[![StockPilot AI security controls and current boundaries](images/security-overview.svg)](images/security-overview.svg)
 
 ## Reporting a vulnerability
 

@@ -48,8 +48,8 @@
     <rect x="705" y="157" width="445" height="395" rx="18" fill="#fff"/>
     <text x="733" y="193" class="label" fill="#718096">APPLICATION STACK</text>
     <rect x="733" y="211" width="389" height="75" rx="12" fill="#eff5ff" stroke="#dce7fb"/>
-    <rect x="749" y="228" width="42" height="42" rx="10" fill="#61dafb"/><path d="M770 235c-12 0-19 4-19 7s7 7 19 7 19-4 19-7-7-7-19-7Zm0 0c-6 10-8 18-5 20s10-3 16-13 8-18 5-20-10 3-16 13Z" fill="none" stroke="#17324d" stroke-width="1.5"/><circle cx="770" cy="249" r="2.5" fill="#17324d"/>
-    <text x="808" y="239" class="cardtitle">Frontend</text><text x="808" y="261" class="small muted">React 18 · TypeScript · Vite</text><text x="1093" y="253" class="tiny" text-anchor="end" fill="#2e5fd0">UI</text>
+    <rect x="749" y="228" width="42" height="42" rx="10" fill="#20232a"/><path d="M770 235c-12 0-19 4-19 7s7 7 19 7 19-4 19-7-7-7-19-7Zm0 0c-6 10-8 18-5 20s10-3 16-13 8-18 5-20-10 3-16 13Z" fill="none" stroke="#61dafb" stroke-width="1.8"/><circle cx="770" cy="249" r="2.5" fill="#61dafb"/>
+    <text x="808" y="239" class="cardtitle">Frontend</text><text x="808" y="261" class="small muted">React 18 · TypeScript · Vite</text><rect x="1016" y="223" width="30" height="22" rx="4" fill="#3178c6"/><text x="1031" y="239" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">TS</text><path d="M1062 229 1070 224l8 5-3 10h-9z" fill="#ffd62e"/><path d="m1067 228 3-2 4 2-1 6h-5z" fill="#646cff"/><text x="1093" y="263" class="tiny" text-anchor="end" fill="#2e5fd0">UI</text>
     <path d="M927 287v20" stroke="#a9bce2" stroke-width="2"/><path d="m922 302 5 7 5-7" fill="none" stroke="#a9bce2" stroke-width="2"/>
     <rect x="733" y="311" width="389" height="75" rx="12" fill="#eef8f3" stroke="#d5ecdf"/>
     <rect x="749" y="328" width="42" height="42" rx="10" fill="#159b83"/><path d="M760 339h20v4h-20zm0 8h20v4h-20zm0 8h13v4h-13z" fill="#fff"/>

@@ -4,7 +4,7 @@
 
 StockPilot keeps an image library and its editable metadata in a local SQLite database. Optional Cohere analysis suggests metadata and visual observations; the creator reviews suggestions before applying them. Manual library work does not require an AI key.
 
-![Python](https://img.shields.io/badge/Python-FastAPI-3776AB?logo=python&logoColor=white) ![React](https://img.shields.io/badge/React-18-149ECA?logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white) ![SQLite](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=FFD43B) ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white) ![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=FFD62E) ![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=FFCC00)
 
 **Status:** single-user MVP for localhost. It has no authentication and is not suitable for network exposure.
 
@@ -21,9 +21,11 @@ CSV import/export, similarity scanning, multi-user accounts, and platform automa
 
 ## Application preview
 
-The illustration below shows the app's actual screen areas and the technology behind them. It is a diagram, not a screenshot. To add a real screenshot as well, save it at `docs/screenshots/dashboard.png` and embed it here.
+This screenshot shows the running Dashboard. The colored illustration below it summarizes the app flow and technology stack.
 
-![StockPilot AI application and technology overview](docs/images/stockpilot-overview.svg)
+[![StockPilot AI Dashboard](docs/screenshots/dashboard.png)](docs/screenshots/dashboard.png)
+
+[![StockPilot AI application and technology overview](docs/images/stockpilot-overview.svg)](docs/images/stockpilot-overview.svg)
 
 ## Architecture
 
